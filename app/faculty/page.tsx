@@ -1,130 +1,176 @@
-"use client";
+'use client';
 
-import Image from "next/image";
+import React, { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
- 
-const faculties = [
+/* ------------------------------------------------------------------ */
+/* Types                                                              */
+/* ------------------------------------------------------------------ */
+export interface Faculty {
+  id: string;
+  name: string;
+  designation: string;
+  department: string;
+  discipline: string;
+  education: string;
+  subjects: string[];
+  experience: string;
+  photo: string;
+  email?: string;
+}
+
+const INITIAL_FACULTY: Faculty[] = [
   {
-    id: 1,
-    name: "Rashedul Ontor",
-    designation: "Founder and CEO",
-    education: "B.Sc in CSE (Studying at Brahmaputra International University)",
-    subjects: "Math, ICT and Science",
-    experience: "6+ Years",
-    photo: "/faculty/rashedul.jpg", 
+    id: 'FAC-01',
+    name: 'Mohammad Asaduzzaman',
+    designation: 'Assistant Professor',
+    department: 'Computer Science & Engineering (CSE)',
+    discipline: 'ICT',
+    education: 'M.Sc. in CSE, BUET',
+    subjects: ['Data Structures', 'Algorithms', 'Web Engineering'],
+    experience: '8+ years',
+    photo: 'https://unsplash.com',
+    email: 'asad.cse@prottoy.edu.bd',
   },
   {
-    id: 2,
-    name: "Md. Shohel Rana",
-    designation: "Founder and MD",
-    education: "BA Hons in Bangla (Govt. Ashek Mahmud College)",
-    subjects: "Bangla",
-    experience: "12+ Years",
-    photo: "/faculty/shohel.jpg",
+    id: 'FAC-02',
+    name: 'Dr. Rehana Parvin',
+    designation: 'Associate Professor',
+    department: 'Department of Agronomy',
+    discipline: 'Agriculture',
+    education: 'Ph.D. in Agronomy, BAU',
+    subjects: ['Crop Production', 'Soil Science'],
+    experience: '12+ years',
+    photo: 'https://unsplash.com',
+    email: 'rehana.agro@prottoy.edu.bd',
   },
-  {
-    id: 3,
-    name: "Ratan Mahmud",
-    designation: "Instructor",
-    education: "B.Sc in Math (Studying at Govt. Ashek Mahmud College)",
-    subjects: "Math and Science",
-    experience: "3+ Years",
-    photo: "/faculty/ratan.jpg",
-  },
-  {
-    id: 4,
-    name: "Md. Maruf Hasan",
-    designation: "Instructor",
-    education: "BA Hons in English (Studying at Govt. Ashek Mahmud College)",
-    subjects: "English",
-    experience: "3+ Years",
-    photo: "/faculty/maruf.jpg",
-  },
-  {
-    id: 5,
-    name: "Sayan Mahmud Mahi",
-    designation: "Instructor",
-    education: "B.Sc in Textile Engineering (Jamalpur Textile Engineering College)",
-    subjects: "Science",
-    experience: "3+ Years",
-    photo: "/faculty/sayan.jpg",
-  }
 ];
 
-export default function FacultyPage() {
+const ADDITIONAL_FACULTY: Faculty[] = [
+  {
+    id: 'FAC-03',
+    name: 'Barrister Tanvir Ahmed',
+    designation: 'Part-time Lecturer',
+    department: 'Department of Law',
+    discipline: 'Law',
+    education: 'LL.M., University of London',
+    subjects: ['Constitutional Law', 'Criminal Procedure'],
+    experience: '5+ years',
+    photo: 'https://unsplash.com',
+    email: 'tanvir.law@prottoy.edu.bd',
+  },
+];
+
+const FULL_FACULTY_LIST: Faculty[] = [...INITIAL_FACULTY, ...ADDITIONAL_FACULTY];
+const DISCIPLINE_FILTERS = ['All', 'ICT', 'Agriculture', 'Law'] as const;
+
+/* ------------------------------------------------------------------ */
+/* Inline Faculty Card Component                                      */
+/* ------------------------------------------------------------------ */
+function LocalFacultyCard({ teacher }: { teacher: Faculty }) {
+  const [imgError, setImgError] = useState(false);
+
   return (
-    <div style={{ minHeight: '100vh', padding: '50px 20px', background: '#f8fafc', fontFamily: 'sans-serif' }}>
-      
-      {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: '50px' }}>
-        <h1 style={{ fontSize: '36px', fontWeight: '900', color: '#1e293b', margin: '0 0 10px 0' }}>Our Honorable Faculty</h1>
-        <p style={{ color: '#64748b', fontSize: '16px', maxWidth: '600px', margin: '0 auto' }}>
-          Meet the experienced and dedicated teachers of Prottoy Academy who are committed to building your bright future.
-        </p>
+    <article className="group bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+      <div className="relative h-72 bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center">
+        {imgError ? (
+          <span className="text-6xl text-slate-400">👨‍🏫</span>
+        ) : (
+          <Image
+            src={teacher.photo}
+            alt={teacher.name}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className="object-cover"
+            onError={() => setImgError(true)}
+          />
+        )}
+        <span className="absolute top-3 right-3 bg-slate-900/80 text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full">
+          {teacher.discipline}
+        </span>
       </div>
 
-      {/* Grid Container for Faculty Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '30px', maxWidth: '1200px', margin: '0 auto' }}>
-        
-        {faculties.map((teacher) => (
-          <div key={teacher.id} style={{ backgroundColor: 'white', borderRadius: '15px', overflow: 'hidden', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', transition: 'transform 0.3s ease', cursor: 'pointer' }}
-               onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-5px)'}
-               onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
-            
-            {/* Image Section */}
-            <div style={{ height: '280px', backgroundColor: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-              {/* যদি ছবি না থাকে, তবে একটি ডামি আইকন দেখাবে */}
-              <span style={{ fontSize: '50px', color: '#94a3b8', position: 'absolute' }}>👨‍🏫</span>
-              
-              {/* রিয়েল ছবি শো করার কোড */}
-              <Image 
-                src={teacher.photo} 
-                alt={teacher.name} 
-                fill 
-                style={{ objectFit: 'cover', position: 'absolute', top: 0, left: 0 }} 
-                // ছবি লোড না হলে এরর যেন পুরো সাইট ক্র্যাশ না করে, তার ব্যবস্থা
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
-            </div>
+      <div className="p-6">
+        <h2 className="text-lg font-bold text-slate-900">{teacher.name}</h2>
+        <p className="text-sky-600 font-semibold text-sm mt-0.5">{teacher.designation}</p>
+        <p className="text-slate-500 text-xs mt-1">{teacher.department}</p>
 
-            {/* Teacher Details */}
-            <div style={{ padding: '25px' }}>
-              <h2 style={{ fontSize: '22px', fontWeight: 'bold', color: '#0f172a', margin: '0 0 5px 0' }}>{teacher.name}</h2>
-              <p style={{ color: '#0284c7', fontSize: '14px', fontWeight: '600', margin: '0 0 15px 0' }}>{teacher.designation}</p>
-              
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                  <span>🎓</span>
-                  <div>
-                    <span style={{ fontSize: '12px', color: '#94a3b8', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Education</span>
-                    <span style={{ fontSize: '14px', color: '#334155', fontWeight: '500' }}>{teacher.education}</span>
-                  </div>
-                </div>
+        <div className="mt-4 space-y-1.5 text-sm text-slate-600">
+          <p><span className="font-semibold text-slate-700">Education:</span> {teacher.education}</p>
+          <p><span className="font-semibold text-slate-700">Subjects:</span> {teacher.subjects.join(', ')}</p>
+          <p><span className="font-semibold text-slate-700">Experience:</span> {teacher.experience}</p>
+        </div>
 
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                  <span>📚</span>
-                  <div>
-                    <span style={{ fontSize: '12px', color: '#94a3b8', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Subjects</span>
-                    <span style={{ fontSize: '14px', color: '#334155', fontWeight: '500' }}>{teacher.subjects}</span>
-                  </div>
-                </div>
+        {teacher.email && (
+          <a href={`mailto:${teacher.email}`} className="mt-4 inline-block text-xs font-semibold text-sky-600 hover:text-sky-800">
+            Contact Faculty -&gt;
+          </a>
+        )}
+      </div>
+    </article>
+  );
+}
 
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                  <span>⏳</span>
-                  <div>
-                    <span style={{ fontSize: '12px', color: '#94a3b8', display: 'block', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Experience</span>
-                    <span style={{ fontSize: '14px', color: '#334155', fontWeight: '500' }}>{teacher.experience}</span>
-                  </div>
-                </div>
-              </div>
+/* ------------------------------------------------------------------ */
+/* Main Faculty Page                                                  */
+/* ------------------------------------------------------------------ */
+export default function FacultyPage() {
+  const router = useRouter();
+  const [selectedDiscipline, setSelectedDiscipline] = useState<string>('All');
 
-            </div>
+  const filteredFaculty = useMemo(() => {
+    if (selectedDiscipline === 'All') return FULL_FACULTY_LIST;
+    return FULL_FACULTY_LIST.filter((t) => t.discipline === selectedDiscipline);
+  }, [selectedDiscipline]);
+
+  return (
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
+      <header className="bg-slate-900 px-6 py-6 text-white shadow-md">
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold tracking-tight">Verified Faculty Portal</h1>
+            <p className="mt-1 text-xs text-slate-400">Registered and verified teachers</p>
           </div>
-        ))}
+          <button
+            type="button"
+            onClick={() => router.push('/dashboard?role=admin')}
+            className="rounded-xl border border-white/10 bg-white/10 px-4 py-2 text-xs font-bold text-white transition hover:bg-white/20"
+          >
+            ← Back Dashboard
+          </button>
+        </div>
+      </header>
 
-      </div>
+      <main className="mx-auto max-w-7xl px-6 py-8">
+        <div className="mb-8 flex flex-wrap items-center gap-2.5 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <span className="px-2 text-xs font-bold uppercase tracking-wider text-slate-400">Discipline filter:</span>
+          {DISCIPLINE_FILTERS.map((discipline) => (
+            <button
+              key={discipline}
+              type="button"
+              onClick={() => setSelectedDiscipline(discipline)}
+              className={`rounded-xl px-4 py-2 text-xs font-bold transition-all ${
+                selectedDiscipline === discipline ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              {discipline === 'All' ? 'All Teachers' : discipline}
+            </button>
+          ))}
+        </div>
+
+        {filteredFaculty.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-slate-300 bg-white py-16 text-center">
+            <p className="text-sm font-semibold text-slate-500">No faculty found in this discipline.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {filteredFaculty.map((faculty) => (
+              <LocalFacultyCard key={faculty.id} teacher={faculty} />
+            ))}
+          </div>
+        )}
+      </main>
     </div>
   );
 }

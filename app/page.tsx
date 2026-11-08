@@ -10,12 +10,15 @@ export default function LoginPage() {
     e.preventDefault();
     if (!userId.trim()) return;
 
+    // সেশন রোল এবং ক্রেডেনশিয়াল চেকিং লজিক
     if (userId.toLowerCase() === 'admin') {
-      router.push('/dashboard?role=admin');
+      router.push('/dashboard?role=admin&user=JohnDoe');
     } else if (userId.startsWith('017')) {
       router.push('/dashboard?role=teacher');
-    } else {
+    } else if (userId.startsWith('PAMS-S')) {
       router.push(`/dashboard?role=student&id=${userId}`);
+    } else {
+      alert('Invalid Credentials! অ্যাক্সেস ডিনাইড ❌');
     }
   };
 
@@ -23,21 +26,21 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white font-sans antialiased">
       <form onSubmit={handleLogin} className="bg-slate-800 p-8 rounded-2xl shadow-xl space-y-5 w-full max-w-sm border border-slate-700">
         <div className="text-center space-y-1">
-          <h2 className="text-xl font-bold tracking-tight">🛡️ Prottoy Academy Portal</h2>
-          <p className="text-[11px] text-slate-400">ইউনিফাইড সিকিউরড লগইন গেটওয়ে</p>
+          <h2 className="text-xl font-bold tracking-tight">🛡️ Prottoy Academy ERP</h2>
+          <p className="text-[11px] text-slate-400">রোল বেসড গেটওয়ে অথেনটিকেশন পোর্টাল</p>
         </div>
         <div>
-          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5">আপনার ইউজার আইডি (User ID)</label>
+          <label className="block text-[10px] font-bold text-slate-400 uppercase mb-1.5">ইউজার আইডি দিয়ে সাইন-ইন করুন</label>
           <input 
             type="text" 
-            placeholder="admin / 017... / Student ID" 
+            placeholder="admin / 017... / PAMS-S-101" 
             value={userId}
             onChange={(e) => setUserId(e.target.value)}
             className="w-full p-2.5 rounded-xl bg-slate-700 text-white font-medium focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-sm"
           />
         </div>
         <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 p-2.5 rounded-xl font-bold transition shadow-md">
-          Portal Login
+          Sign In Secured Auth
         </button>
       </form>
     </div>
